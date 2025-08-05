@@ -146,8 +146,8 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lPa
 	switch(iMessage){
 		case WM_CREATE:
 			g_hWnd = hWnd;
-			Row = 15;
-			Column = 30;
+			Row = 16;
+			Column = 16;
 			ButtonLayout.y = Row;
 			ButtonLayout.x = Column;
 			ButtonLayout.Width = ButtonLayout.Height = DEFAULT_BTN_SIZE;
@@ -168,11 +168,10 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lPa
 			AppendMenu(hPopup, MF_STRING, IDC_MENU, TEXT("Program"));
 			AppendMenu(hPopup, MF_STRING, IDC_MENU+1, TEXT("Restart"));
 			AppendMenu(hPopup, MF_STRING | MF_POPUP, (UINT_PTR)hMapSizePopup, TEXT("MapSize"));
-			AppendMenu(hMapSizePopup, MF_STRING, IDC_MAPSIZE+1, TEXT("15 * 30"));
-			AppendMenu(hMapSizePopup, MF_STRING | MF_CHECKED, IDC_MAPSIZE+2, TEXT("20 * 30"));
-			AppendMenu(hMapSizePopup, MF_STRING, IDC_MAPSIZE+3, TEXT("30 * 40"));
-			AppendMenu(hMapSizePopup, MF_STRING, IDC_MAPSIZE+4, TEXT("40 * 50"));
-			AppendMenu(hMapSizePopup, MF_STRING, IDC_MAPSIZE+5, TEXT("50 * 60"));
+			AppendMenu(hMapSizePopup, MF_STRING, IDC_MAPSIZE+1, TEXT("9 * 9"));
+			AppendMenu(hMapSizePopup, MF_STRING | MF_CHECKED, IDC_MAPSIZE+2, TEXT("16 * 16"));
+			AppendMenu(hMapSizePopup, MF_STRING, IDC_MAPSIZE+3, TEXT("16 * 30"));
+			AppendMenu(hMapSizePopup, MF_STRING, IDC_MAPSIZE+4, TEXT("20 * 20"));
 			SetMenu(hWnd, hMenu);
 			SelectMenuNumber = 1;
 			PopupNumber = 2;
@@ -634,7 +633,7 @@ LRESULT CALLBACK GameStateWndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM l
 			switch(wParam){
 				case 1:
 					ButtonLayout = *(struct tag_Layout*)lParam;
-					MineCount = (ButtonLayout.x + ButtonLayout.y) * 2;
+					MineCount = (ButtonLayout.x * ButtonLayout.y) * 0.15f;
 					break;
 
 				case 2:
@@ -671,14 +670,14 @@ LRESULT CALLBACK GameStateWndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM l
 			hdc = BeginPaint(hWnd, &ps);
 			GetClientRect(hWnd, &rt);
 			FillRect(hdc, &rt, GetSysColorBrush(COLOR_BTNFACE));
-			SetRect(&lrt, GameStateLayout.x + ButtonLayout.Width, GameStateLayout.Height / 2 - ButtonLayout.Height, GameStateLayout.x + ButtonLayout.Width + ButtonLayout.Width * 6, GameStateLayout.Height / 2 - ButtonLayout.Height + ButtonLayout.Height * 2);
+			SetRect(&lrt, GameStateLayout.x + ButtonLayout.Width, GameStateLayout.Height / 2 - ButtonLayout.Height, GameStateLayout.x + ButtonLayout.Width * 7, GameStateLayout.Height / 2 + ButtonLayout.Height);
 			hFont = CreateFont(ButtonLayout.Height * 2, ButtonLayout.Width, 0, 0, 0, 0, 0, 0, DEFAULT_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, VARIABLE_PITCH | FF_DONTCARE, "Arial");
 			hOldFont = (HFONT)SelectObject(hdc, hFont);
 
 			PrevBkColor = SetBkColor(hdc, RGB(0,0,0));
 			PrevTextColor = SetTextColor(hdc, RGB(255,0,0));
 			wsprintf(buf, TEXT("%03d"), MineCount);
-			TextOut(hdc, lrt.left, lrt.top, buf, lstrlen(buf));
+			TextOut(hdc, 0, lrt.top, buf, lstrlen(buf));
 			SetTextColor(hdc, PrevTextColor);
 			SetBkColor(hdc, PrevBkColor);
 
@@ -840,7 +839,7 @@ int* Randomization(int MineCount, int Row, int Column){
 BOOL Settings(int*** Board, int Row, int Column){
 	if(Board == NULL){return FALSE;}
 
-	int MineCount = (Row + Column) * 2;
+	int MineCount = (Row * Column) * 0.15f;
 	int Scope = Row * Column;
 
 	struct tag_SelectNumber* S  = (struct tag_SelectNumber*)calloc(MineCount, sizeof(struct tag_SelectNumber));
